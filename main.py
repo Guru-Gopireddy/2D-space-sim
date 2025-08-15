@@ -24,7 +24,7 @@ LIGHT_GREY = 0xD3D3D3
 show_graph_axises = True
 pygame.init()
 FONT = pygame.font.SysFont("Bahnschrift", 25)
-h, w = 1440, 2560
+h, w = 1440, 2560 #PLEASE use even positive integers for resolution, odd numbers never work with the grid thing i made
 screen = pygame.display.set_mode((w, h))
 manager = pygame_gui.UIManager((w, h))
 clock = pygame.time.Clock()
