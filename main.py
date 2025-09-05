@@ -21,14 +21,17 @@ SCALE = 100                    # pixels per AU
 TIME_SCALE = 1                 # seconds simulated per real second
 LIGHT_GREY = 0xD3D3D3
 
+display_velocity_vectors = True
 show_graph_axises = True
+
 pygame.init()
 FONT = pygame.font.SysFont("Bahnschrift", 25)
-h, w = 1440, 2560 #PLEASE use even positive integers for resolution, odd numbers never work with the grid thing i made
+h, w = 1440, 2560
 screen = pygame.display.set_mode((w, h))
 manager = pygame_gui.UIManager((w, h))
 clock = pygame.time.Clock()
 FRAMERATE_CAP = 60
+
 
 def secondsToTimeString(seconds: int, sep: str = " "):
     time: str = []
@@ -162,10 +165,29 @@ class CosmicObject:
         self.vx += 0.5 * (ax0 + ax1) * dt
         self.vy += 0.5 * (ay0 + ay1) * dt
 
+        self.ax = ax1
+        self.ay = ay1
+
     def draw(self, screen):
         px = int(self.realX / AU * SCALE + w/2)
         py = int(self.realY / AU * SCALE + h/2)
+        if display_velocity_vectors:
+            v_x = px + self.vx/500
+            v_y = py + self.vy/500
+            # pygame.draw.line(screen, "red", (px, py), (v_x, v_y), width=5)
+            pygame.draw.line(screen, "crimson", (px, py), (v_x, py), width=5)
+            pygame.draw.line(screen, "cyan", (px, py), (px, v_y), width=5)
+            if v_x < px:
+                pygame.draw.polygon(screen, "crimson", ((v_x-5, py), (v_x, py-5), (v_x, py+5)), width=5)
+            elif v_x > px:
+                pygame.draw.polygon(screen, "crimson", ((v_x+5, py), (v_x, py-5), (v_x, py+5)), width=5)
+            if v_y < py:
+                pygame.draw.polygon(screen, "cyan", ((px, v_y-5), (px-5, v_y), (px+5, v_y)), width=5)
+            if v_y > py:
+                pygame.draw.polygon(screen, "cyan", ((px, v_y+5), (px-5, v_y), (px+5, v_y)), width=5)
+            
         pygame.draw.circle(screen, self.color, (px, py), self.radius)
+        
 
 objects = [
     CosmicObject(
@@ -204,6 +226,12 @@ changeSimSpeed = pygame_gui.elements.UIButton(
 addNewPlanet = pygame_gui.elements.UIButton(
     pygame.Rect((20, 250), (250, 125)),
     "Add new planet",
+    manager=manager
+)
+
+settings = pygame_gui.elements.UIButton(
+    pygame.Rect((20, w-20), (50, 50)),
+    "Settings",
     manager=manager
 )
 
@@ -274,7 +302,7 @@ while running:
     screen.fill((0, 0, 0))
 
     #DRAW LINES FOR GRAPH
-    if show_graph_axises:
+    if show_graph_axises: # Weird stuff happens when pixels per AU is changed, will make sure to fix later - 9/5/2025
         pygame.draw.line(screen, "white", (0, h/2), (w, h/2))
         pygame.draw.line(screen, "white", (w/2, 0), (w/2, h))
 
