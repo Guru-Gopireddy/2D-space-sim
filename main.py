@@ -26,7 +26,7 @@ show_graph_axises = True
 
 pygame.init()
 FONT = pygame.font.SysFont("Bahnschrift", 25)
-h, w = 1440, 2560
+h, w = 720, 1280
 screen = pygame.display.set_mode((w, h))
 manager = pygame_gui.UIManager((w, h))
 clock = pygame.time.Clock()
@@ -306,24 +306,38 @@ while running:
         pygame.draw.line(screen, "white", (0, h/2), (w, h/2))
         pygame.draw.line(screen, "white", (w/2, 0), (w/2, h))
 
-        x_offset = (w % (SCALE/5))/2 # cool little grid technique i made (idk if anyone else has done it) by trial and error
-        for i in range(int(x_offset), int(w), int(SCALE/5)):
-            length = 5 # horrible name i know, i don't know what else to call it
-            if (i+SCALE/5-x_offset) % SCALE == 0:
+        # from mid to right side
+        for i in range(int(w/2), int(w), int(SCALE/5)):
+            length = 5
+            if ((i-int(w/2)) % SCALE/5 == 0):
                 length = 15
             pygame.draw.line(screen, "white", (i, h/2+length), (i, h/2-length))
 
-        y_offset = (h % (SCALE/5))/2
-        for i in range(int(y_offset), h, int(SCALE/5)):
-            length = 5  
-            if (i-SCALE/5-y_offset) % SCALE == 0:
+        # from mid to left
+        for i in range(int(w/2), 0, -int(SCALE/5)):
+            length = 5
+            if ((int(w/2)-i) % SCALE/5 == 0):
+                length = 15
+            pygame.draw.line(screen, "white", (i, h/2+length), (i, h/2-length))
+
+        # from mid to below
+        for i in range(int(h/2), int(h), int(SCALE/5)):
+            length = 5
+            if ((i-int(h/2)) % SCALE/5 == 0):
                 length = 15
             pygame.draw.line(screen, "white", (w/2+length, i), (w/2-length, i))
 
+        # from mid to above
+        for i in range(int(h/2), 0, -int(SCALE/5)):
+            length = 5
+            if ((int(h/2)-i) % SCALE/5 == 0):
+                length = 15
+            pygame.draw.line(screen, "white", (w/2+length, i), (w/2-length, i))
+            
     for obj in objects:
         obj.draw(screen)
     screen.blit(
-        FONT.render(f"Simulation speed: {secondsToTimeString(TIME_SCALE, ", ")}.\nSimulation Scale: {SCALE} pixels per Astronomical Unit.", True, pygame.Color("White")),
+        FONT.render(f"Simulation speed: {secondsToTimeString(TIME_SCALE, ', ')}.\nSimulation Scale: {SCALE} pixels per Astronomical Unit.", True, pygame.Color("White")),
         (20, 20)
     )
     manager.update(dt)
